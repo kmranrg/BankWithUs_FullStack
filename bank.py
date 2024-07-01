@@ -3,6 +3,8 @@ from components.primary_font import PRIMARY_FONT, ITALIC_FONT
 from backend_engine import insert_into_db
 from backend_engine import search_account_number_in_db
 from backend_engine import get_account_balance, withdraw_from_account_balance, deposit_to_account_balance
+from components.one_time_password import generate_otp
+from components.notifier import send_email
 
 bank_data = {}
 
@@ -49,8 +51,8 @@ def main(page: ft.Page):
 
     def store_data(e):
         if search_account_number_in_db(int(account_number.value))== "Account not present in the database":
-            bank_data[int(account_number.value)] = {"name":name.value, "city":city.value, "age":int(age.value), "account_type":account_type.value, "amount": int(amount.value), "account_number": int(account_number.value)}
-            customer_values = [int(account_number.value), name.value, city.value, int(age.value), account_type.value, int(amount.value)]
+            bank_data[int(account_number.value)] = {"name":name.value, "pancard":pancard.value, "age":int(age.value), "account_type":account_type.value, "amount": int(amount.value), "account_number": int(account_number.value), "email": email.value, "otp": otp}
+            customer_values = [int(account_number.value), name.value, pancard.value, int(age.value), account_type.value, int(amount.value), email.value, otp]
             insert_into_db(customer_values)
             new_customer_status.visible = True
         else:
@@ -58,22 +60,25 @@ def main(page: ft.Page):
         page.update()
 
     name = ft.TextField(label="Enter name", border_radius=20)
-    city= ft.TextField(label="Enter city", border_radius=20)
+    pancard= ft.TextField(label="Enter PAN card number", border_radius=20)
     age = ft.TextField(label="Enter age", border_radius=20)
     account_type = ft.TextField(label="Enter account type", border_radius=20)
     amount = ft.TextField(label="Enter amount", border_radius=20)
     account_number = ft.TextField(label="Enter account number", border_radius=20)
+    email = ft.TextField(label="Enter email address", border_radius=20)
+    otp = generate_otp()
     submit_customer_button = ft.ElevatedButton("Register", color='green', on_click=store_data)
     new_customer_status = ft.Text("Account created successfully!!!", font_family=PRIMARY_FONT, style="titleLarge", color='green')
     new_customer_status.visible = False
 
     new_customer_form = ft.Column([
         name,
-        city,
+        pancard,
         age,
         account_type,
         amount,
         account_number,
+        email,
         ft.Container(height=5),
         submit_customer_button,
         ft.Container(height=5),
