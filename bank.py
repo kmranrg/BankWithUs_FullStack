@@ -5,6 +5,8 @@ from backend_engine import search_account_number_in_db
 from backend_engine import get_account_balance, withdraw_from_account_balance, deposit_to_account_balance
 from components.one_time_password import generate_otp
 from components.notifier import send_email
+from backend_engine import get_details_to_send_mail
+from backend_engine import update_otp, get_otp_from_db
 
 bank_data = {}
 
@@ -24,6 +26,7 @@ def main(page: ft.Page):
 
     def main_menu_function(e):
         if main_menu_choice.value == '1':
+            otp_validation_error.visible = False
             account_already_exists_error.visible = False
             user_not_found_error.visible = False
             new_customer_form.visible = True
@@ -31,12 +34,14 @@ def main(page: ft.Page):
             user_account_validation_button.visible = False
             main_menu_error.visible = False
         elif main_menu_choice.value == '2':
+            otp_validation_error.visible = False
             account_already_exists_error.visible = False
             new_customer_form.visible = False
             account_number_for_validation.visible = True
             user_account_validation_button.visible = True
             main_menu_error.visible = False
         else:
+            otp_validation_error.visible = False
             account_already_exists_error.visible = False
             main_menu_error.visible = True
             new_customer_form.visible = False
@@ -91,23 +96,46 @@ def main(page: ft.Page):
     main_menu_error = ft.Text("Please enter a valid input...", font_family=PRIMARY_FONT, style="titleLarge", color='red')
     main_menu_error.visible = False
 
+    def search_in_db(e):
+        if search_account_number_in_db(int(account_number_for_validation.value)) == "Account Exists":
+            new_otp = generate_otp()
+            update_otp(int(account_number_for_validation.value), new_otp)
+            details = get_details_to_send_mail(int(account_number_for_validation.value))
+            email_detail = details[0]
+            name_detail = details[1]
+            send_email(email_detail, new_otp, name_detail, int(account_number_for_validation.value))
+            logged_in_data.value = f"Welcome {name_detail}\nAccount ID: {account_number_for_validation.value}"
+            user_not_found_error.visible = False
+            user_entered_otp.visible = True
+            check_user_entered_otp.visible = True
+        else:
+            user_not_found_error.visible = True
+        page.update()
 
-    account_number_for_validation = ft.TextField(label="confirm your account number", border_radius=20)
+    account_number_for_validation = ft.TextField(label="confirm your account number", border_radius=20, on_submit=search_in_db)
     account_number_for_validation.visible = False
 
     main_menu_button = ft.ElevatedButton("Submit", on_click=main_menu_function)
     user_not_found_error = ft.Text("Account not found in the Database", font_family=PRIMARY_FONT, style="titleLarge", color='red')
     user_not_found_error.visible = False
 
-    def search_in_db(e):
-        if search_account_number_in_db(int(account_number_for_validation.value)) == "Account Exists":
-            logged_in_data.value = f"Account No.: {account_number_for_validation.value}"
+    def validate_otp(e):
+        if user_entered_otp.value == get_otp_from_db(int(account_number_for_validation.value)):
             main_portal.visible = False
-            user_not_found_error.visible = False
             user_portal.visible = True
+            otp_validation_error.visible = False
         else:
-            user_not_found_error.visible = True
+            otp_validation_error.visible = True
+            main_portal.visible = True
+            user_portal.visible = False
         page.update()
+
+    user_entered_otp = ft.TextField(label="enter OTP", border_radius=20)
+    user_entered_otp.visible = False
+    check_user_entered_otp = ft.ElevatedButton("Validate OTP", on_click=validate_otp)
+    check_user_entered_otp.visible = False
+    otp_validation_error = ft.Text("Incorrect OTP, confirm your account number again to regenerate OTP...", font_family=PRIMARY_FONT, style="titleLarge", color='red')
+    otp_validation_error.visible = False
 
     user_account_validation_button = ft.IconButton(icon=ft.icons.ADS_CLICK, on_click=search_in_db, icon_color='blue')
     user_account_validation_button.visible = False
@@ -126,7 +154,9 @@ def main(page: ft.Page):
             ft.Container(height=5),
             ft.Row([account_number_for_validation,user_account_validation_button]),
             main_menu_error,
-            user_not_found_error
+            user_not_found_error,
+            ft.Row([user_entered_otp, check_user_entered_otp]),
+            otp_validation_error
             
         ]
     )
@@ -140,23 +170,29 @@ def main(page: ft.Page):
 
     def user_portal_validation(e):
         if user_portal_choice.value == '1':
-            user_portal_result.value = 'Your account balance is ₹' + str(get_account_balance(int(account_number_for_validation.value)))
+            user_portal_result.value = 'Your account balance is ₹ ' + str(get_account_balance(int(account_number_for_validation.value)))
         elif user_portal_choice.value == '2':
             withdraw_amount.visible = True
-            user_portal_result.value = 'Amount withdrawn, new account balance is ₹' + str(withdraw_from_account_balance(int(account_number_for_validation.value), int(withdraw_amount.value)))
+            user_portal_result.value = 'Amount withdrawn, new account balance is ₹ ' + str(withdraw_from_account_balance(int(account_number_for_validation.value), int(withdraw_amount.value)))
         elif user_portal_choice.value == '3':
             deposit_amount.visible = True
-            user_portal_result.value = 'Amount deposited, new account balance is ₹' + str(deposit_to_account_balance(int(account_number_for_validation.value), int(deposit_amount.value)))
+            user_portal_result.value = 'Amount deposited, new account balance is ₹ ' + str(deposit_to_account_balance(int(account_number_for_validation.value), int(deposit_amount.value)))
         elif user_portal_choice.value == '4':
             user_portal.visible = False
             main_portal.visible = True
+            user_entered_otp.visible = False
+            check_user_entered_otp.visible = False
+            otp_validation_error.visible = False
+            account_number_for_validation.visible = False
+            user_not_found_error.visible = False
+            user_account_validation_button.visible = False
         else:
             user_portal_result.value = "WARNING: Invalid Choice!!!"
         user_portal_result.visible = True
         page.update()
 
     user_portal_submit_button = ft.ElevatedButton("Submit", on_click=user_portal_validation)
-    logged_in_data = ft.Text(font_family=ITALIC_FONT, style="titleSmall", text_align='right')
+    logged_in_data = ft.Text(font_family=ITALIC_FONT, style="titleSmall", text_align='left')
 
     user_portal =ft.Column(
         [

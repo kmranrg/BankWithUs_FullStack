@@ -78,3 +78,35 @@ def deposit_to_account_balance(account_number, deposit_amount):
     cursor.close()
     db.close()
     return record[0][0]
+
+def get_details_to_send_mail(account_number):
+    db = sqlite3.connect("Bank_DB.sqlite")
+    cursor = db.cursor()
+    query = f"select email, name from bank_customer_records where account_number is {int(account_number)}"
+    cursor.execute(query)
+    record = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return record[0]
+
+def update_otp(account_number, new_otp):
+    db = sqlite3.connect("Bank_DB.sqlite")
+    cursor = db.cursor()
+
+    query = f"update bank_customer_records set otp = {new_otp} where account_number is {int(account_number)}"
+    cursor.execute(query)
+    db.commit()
+
+    cursor.close()
+    db.close()
+    return
+
+def get_otp_from_db(account_number):
+    db = sqlite3.connect("Bank_DB.sqlite")
+    cursor = db.cursor()
+    query = f"select otp from bank_customer_records where account_number is {int(account_number)}"
+    cursor.execute(query)
+    record = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return record[0][0]
