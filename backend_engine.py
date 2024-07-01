@@ -4,14 +4,16 @@ def insert_into_db(customer_values):
 
     db = sqlite3.connect("Bank_DB.sqlite")
 
-    db.execute("create table if not exists bank_customer_records(account_number integer, name text, city text, age integer, account_type text, amount integer)")
+    db.execute("create table if not exists bank_customer_records(account_number integer, name text, pan_card text, age integer, account_type text, amount integer, email text, otp text)")
 
-    db.execute("insert into bank_customer_records values(?,?,?,?,?,?)",customer_values)
+    db.execute("insert into bank_customer_records values(?,?,?,?,?,?,?,?)",customer_values)
     db.commit()
     db.close()
 
 def search_account_number_in_db(account_number):
     db = sqlite3.connect("Bank_DB.sqlite")
+    db.execute("create table if not exists bank_customer_records(account_number integer, name text, pan_card text, age integer, account_type text, amount integer, email text, otp text)")
+    db.commit()
     cursor = db.cursor()
     query = f"select * from bank_customer_records where account_number is {int(account_number)}"
     cursor.execute(query)
