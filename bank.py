@@ -7,6 +7,7 @@ from components.one_time_password import generate_otp
 from components.notifier import send_email
 from backend_engine import get_details_to_send_mail
 from backend_engine import update_otp, get_otp_from_db
+from components.typewritercontrol import TypeWriterControl
 
 bank_data = {}
 
@@ -23,6 +24,12 @@ def main(page: ft.Page):
         "playwrite": "fonts/PlaywriteUSTrad-VariableFont_wght.ttf",
         "oswald": "fonts/Oswald-VariableFont_wght.ttf"
     }
+
+    def fab_pressed(e):
+        page.open(ft.SnackBar(ft.Text("Copyright © BankWithUs | Designed & Developed by Anurag",text_align='center')))
+        page.update()
+
+    page.floating_action_button = ft.FloatingActionButton(icon=ft.icons.PERSON, on_click=fab_pressed, bgcolor='#7A3214', foreground_color='white')
 
     def main_menu_function(e):
         if main_menu_choice.value == '1':
@@ -67,7 +74,7 @@ def main(page: ft.Page):
     name = ft.TextField(label="Enter name", border_radius=20)
     pancard= ft.TextField(label="Enter PAN card number", border_radius=20)
     age = ft.TextField(label="Enter age", border_radius=20)
-    account_type = ft.TextField(label="Enter account type", border_radius=20)
+    account_type = ft.Dropdown(label="Enter account type", border_radius=20, options=[ft.dropdown.Option("Savings"),ft.dropdown.Option("Current")])
     amount = ft.TextField(label="Enter amount", border_radius=20)
     account_number = ft.TextField(label="Enter account number", border_radius=20)
     email = ft.TextField(label="Enter email address", border_radius=20)
@@ -162,7 +169,7 @@ def main(page: ft.Page):
     )
 
     user_portal_choice = ft.TextField(label="Enter Choice", border_radius=20, border='none')
-    user_portal_result = ft.Text(font_family=PRIMARY_FONT, color='orange', style='titleLarge')
+    user_portal_result = TypeWriterControl(font_family=PRIMARY_FONT, color='orange')
     user_portal_result.visible = False
 
     withdraw_amount = ft.TextField(label="withdraw_amount", border_radius=20, width=150, border='none')
@@ -170,13 +177,13 @@ def main(page: ft.Page):
 
     def user_portal_validation(e):
         if user_portal_choice.value == '1':
-            user_portal_result.value = 'Your account balance is ₹ ' + str(get_account_balance(int(account_number_for_validation.value)))
+            user_portal_result.text_to_print = 'Your account balance is ₹ ' + str(get_account_balance(int(account_number_for_validation.value)))
         elif user_portal_choice.value == '2':
             withdraw_amount.visible = True
-            user_portal_result.value = 'Amount withdrawn, new account balance is ₹ ' + str(withdraw_from_account_balance(int(account_number_for_validation.value), int(withdraw_amount.value)))
+            user_portal_result.text_to_print = 'Amount withdrawn, new account balance is ₹ ' + str(withdraw_from_account_balance(int(account_number_for_validation.value), int(withdraw_amount.value)))
         elif user_portal_choice.value == '3':
             deposit_amount.visible = True
-            user_portal_result.value = 'Amount deposited, new account balance is ₹ ' + str(deposit_to_account_balance(int(account_number_for_validation.value), int(deposit_amount.value)))
+            user_portal_result.text_to_print = 'Amount deposited, new account balance is ₹ ' + str(deposit_to_account_balance(int(account_number_for_validation.value), int(deposit_amount.value)))
         elif user_portal_choice.value == '4':
             user_portal.visible = False
             main_portal.visible = True
@@ -187,8 +194,9 @@ def main(page: ft.Page):
             user_not_found_error.visible = False
             user_account_validation_button.visible = False
         else:
-            user_portal_result.value = "WARNING: Invalid Choice!!!"
+            user_portal_result.text_to_print = "WARNING: Invalid Choice!!!"
         user_portal_result.visible = True
+        user_portal_result.update()
         page.update()
 
     user_portal_submit_button = ft.ElevatedButton("Submit", on_click=user_portal_validation, icon=ft.icons.CHECK, icon_color='white', bgcolor='#7A3214', color='white')
