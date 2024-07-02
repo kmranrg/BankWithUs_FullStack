@@ -12,8 +12,8 @@ bank_data = {}
 
 def main(page: ft.Page):
     page.title = "Bank Management System"
-    page.vertical_alignment = "center"
-    page.horizontal_alignment = "center"
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.scroll = "auto"
     page.theme_mode = "light"
 
@@ -50,7 +50,7 @@ def main(page: ft.Page):
             user_not_found_error.visible = False
         page.update()
 
-    main_menu_choice = ft.TextField(label="Enter Choice", border_radius=20, on_submit=main_menu_function)
+    main_menu_choice = ft.TextField(label="Enter Choice", border_radius=20, on_submit=main_menu_function, border='none')
     account_already_exists_error = ft.Text("Account number already exists", font_family=PRIMARY_FONT, style="titleLarge", color='red')
     account_already_exists_error.visible = False
 
@@ -112,7 +112,7 @@ def main(page: ft.Page):
             user_not_found_error.visible = True
         page.update()
 
-    account_number_for_validation = ft.TextField(label="confirm your account number", border_radius=20, on_submit=search_in_db)
+    account_number_for_validation = ft.TextField(label="confirm your account number", border_radius=20, on_submit=search_in_db, border='none')
     account_number_for_validation.visible = False
 
     main_menu_button = ft.ElevatedButton("Submit", on_click=main_menu_function)
@@ -130,7 +130,7 @@ def main(page: ft.Page):
             user_portal.visible = False
         page.update()
 
-    user_entered_otp = ft.TextField(label="enter OTP", border_radius=20)
+    user_entered_otp = ft.TextField(label="enter OTP", border_radius=20, border='none')
     user_entered_otp.visible = False
     check_user_entered_otp = ft.ElevatedButton("Validate OTP", on_click=validate_otp)
     check_user_entered_otp.visible = False
@@ -161,12 +161,12 @@ def main(page: ft.Page):
         ]
     )
 
-    user_portal_choice = ft.TextField(label="Enter Choice", border_radius=20)
+    user_portal_choice = ft.TextField(label="Enter Choice", border_radius=20, border='none')
     user_portal_result = ft.Text(font_family=PRIMARY_FONT, style="titleLarge", color='orange')
     user_portal_result.visible = False
 
-    withdraw_amount = ft.TextField(label="amount", border_radius=20, width=100)
-    deposit_amount = ft.TextField(label="amount", border_radius=20, width=100)
+    withdraw_amount = ft.TextField(label="withdraw_amount", border_radius=20, width=150, border='none')
+    deposit_amount = ft.TextField(label="deposit_amount", border_radius=20, width=130, border='none')
 
     def user_portal_validation(e):
         if user_portal_choice.value == '1':
@@ -201,10 +201,12 @@ def main(page: ft.Page):
             ft.Container(height=30),
 
             ft.Text(value="1. Check Balance", font_family=PRIMARY_FONT, style="titleLarge"),
-            ft.Row([ft.Text(value="2. Withdraw", font_family=PRIMARY_FONT, style="titleLarge"),ft.Container(width=10),withdraw_amount]),
-            ft.Row([ft.Text(value="3. Deposit", font_family=PRIMARY_FONT, style="titleLarge"),ft.Container(width=10),deposit_amount]),
+            ft.Text(value="2. Withdraw", font_family=PRIMARY_FONT, style="titleLarge"),
+            ft.Text(value="3. Deposit", font_family=PRIMARY_FONT, style="titleLarge"),
             ft.Text(value="4. Back To Main Menu", font_family=PRIMARY_FONT, style="titleLarge"),
             ft.Container(height=10),
+            ft.Row([withdraw_amount,ft.Container(width=10),deposit_amount]),
+            ft.Container(height=5),
             user_portal_choice,
             ft.Container(height=5),
             user_portal_submit_button,
@@ -231,8 +233,12 @@ def main(page: ft.Page):
     )
 
     page.add(
-        ft.Container(height=20),
-        main_page
+        ft.Container(
+            content=main_page,
+            alignment=ft.alignment.center,
+            padding=80
+        ),
+        
     )
 
 ft.app(target=main, view=ft.WEB_BROWSER, port=9090, assets_dir="assets")
