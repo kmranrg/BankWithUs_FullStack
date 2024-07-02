@@ -72,7 +72,7 @@ def main(page: ft.Page):
     account_number = ft.TextField(label="Enter account number", border_radius=20)
     email = ft.TextField(label="Enter email address", border_radius=20)
     otp = generate_otp()
-    submit_customer_button = ft.ElevatedButton("Register", color='green', on_click=store_data)
+    submit_customer_button = ft.ElevatedButton("Register", bgcolor='green', on_click=store_data, color='white', icon=ft.icons.NOTES_OUTLINED, icon_color='white')
     new_customer_status = ft.Text("Account created successfully!!!", font_family=PRIMARY_FONT, style="titleLarge", color='green')
     new_customer_status.visible = False
 
@@ -115,7 +115,7 @@ def main(page: ft.Page):
     account_number_for_validation = ft.TextField(label="confirm your account number", border_radius=20, on_submit=search_in_db, border='none')
     account_number_for_validation.visible = False
 
-    main_menu_button = ft.ElevatedButton("Submit", on_click=main_menu_function)
+    main_menu_button = ft.ElevatedButton("Submit", on_click=main_menu_function, icon=ft.icons.CHECK, icon_color='white', bgcolor='#7A3214', color='white')
     user_not_found_error = ft.Text("Account not found in the Database", font_family=PRIMARY_FONT, style="titleLarge", color='red')
     user_not_found_error.visible = False
 
@@ -132,12 +132,12 @@ def main(page: ft.Page):
 
     user_entered_otp = ft.TextField(label="enter OTP", border_radius=20, border='none')
     user_entered_otp.visible = False
-    check_user_entered_otp = ft.ElevatedButton("Validate OTP", on_click=validate_otp)
+    check_user_entered_otp = ft.ElevatedButton("Validate OTP", on_click=validate_otp, icon=ft.icons.NUMBERS, icon_color='white', color='white', bgcolor='blue')
     check_user_entered_otp.visible = False
     otp_validation_error = ft.Text("Incorrect OTP, confirm your account number again to regenerate OTP...", font_family=PRIMARY_FONT, style="titleLarge", color='red')
     otp_validation_error.visible = False
 
-    user_account_validation_button = ft.IconButton(icon=ft.icons.ADS_CLICK, on_click=search_in_db, icon_color='blue')
+    user_account_validation_button = ft.ElevatedButton("Submit & Generate OTP",icon=ft.icons.ADS_CLICK, on_click=search_in_db, icon_color='white', bgcolor="blue", color='white')
     user_account_validation_button.visible = False
 
     main_portal =ft.Column(
@@ -162,7 +162,7 @@ def main(page: ft.Page):
     )
 
     user_portal_choice = ft.TextField(label="Enter Choice", border_radius=20, border='none')
-    user_portal_result = ft.Text(font_family=PRIMARY_FONT, style="titleLarge", color='orange')
+    user_portal_result = ft.Text(font_family=PRIMARY_FONT, color='orange', style='titleLarge')
     user_portal_result.visible = False
 
     withdraw_amount = ft.TextField(label="withdraw_amount", border_radius=20, width=150, border='none')
@@ -191,7 +191,7 @@ def main(page: ft.Page):
         user_portal_result.visible = True
         page.update()
 
-    user_portal_submit_button = ft.ElevatedButton("Submit", on_click=user_portal_validation)
+    user_portal_submit_button = ft.ElevatedButton("Submit", on_click=user_portal_validation, icon=ft.icons.CHECK, icon_color='white', bgcolor='#7A3214', color='white')
     logged_in_data = ft.Text(font_family=ITALIC_FONT, style="titleSmall", text_align='left')
 
     user_portal =ft.Column(
@@ -236,7 +236,7 @@ def main(page: ft.Page):
         ft.Container(
             content=main_page,
             alignment=ft.alignment.center,
-            padding=80
+            padding=30
         ),
         
     )
